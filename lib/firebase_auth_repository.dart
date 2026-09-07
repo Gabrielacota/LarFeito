@@ -1,11 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'auth_repository.dart';
 
 class FirebaseAuthRepository implements AuthRepository {
   final FirebaseAuth _firebaseAuth;
+  final GoogleSignIn _googleSignIn;
 
-  FirebaseAuthRepository({FirebaseAuth? firebaseAuth})
-      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+  FirebaseAuthRepository({
+    FirebaseAuth? firebaseAuth,
+    GoogleSignIn? googleSignIn,
+  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+        _googleSignIn = googleSignIn ?? GoogleSignIn();
 
   @override
   Future<void> login({required String email, required String password}) async {
@@ -22,20 +28,63 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> register({required String email, required String password}) async {
+  Future<void> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
     try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
+      final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      await userCredential.user?.updateDisplayName(name);
     } on FirebaseAuthException catch (e) {
       throw AuthException(_mapFirebaseError(e.code));
     } catch (_) {
       throw const AuthException('Erro ao criar conta.');
     }
   }
+  @override
+  Future<void> signInWithGoogle() async {
+    try {
+      await _googleSignIn.signOut();
 
-  // mensagens do Firebase para texto
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) return;
+
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
+
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Faz o login no Firebase com a credencial do Google
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+
+      // Verifica se a conta foi recém-criada (usuário não existia antes)
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        // Apaga o usuário recém-criado e desconecta
+        await userCredential.user?.delete();
+        await _googleSignIn.signOut();
+
+        // Lança uma exceção personalizada
+        throw const AuthException(
+          'Sua conta do Google não possui cadastro. Cadastre-se primeiro.',
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(_mapFirebaseError(e.code));
+    } catch (e) {
+      if (e is AuthException) rethrow;
+      throw const AuthException('Não foi possível entrar com o Google.');
+    }
+  }
+
   String _mapFirebaseError(String code) {
     switch (code) {
       case 'user-not-found':
