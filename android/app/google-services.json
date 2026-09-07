@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "190453105339",
+    "project_id": "larfeito",
+    "storage_bucket": "larfeito.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190453105339:android:679777562361010064df9e",
+        "android_client_info": {
+          "package_name": "com.example.lar_feito"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "190453105339-tl24pfgut13qpmddiu1rvdqsmumnfhrg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkY6Nv5dm6BQVnyTsN29iIZd-pB2y2Wuw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "190453105339-tl24pfgut13qpmddiu1rvdqsmumnfhrg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "190453105339-vs1c27tnu3ovau77uo6v9rgobi7466vj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.larFeito"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
