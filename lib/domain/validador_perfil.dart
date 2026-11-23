@@ -63,7 +63,7 @@ class ValidadorCodigo extends ValidadorPerfil{
 class ValidadorSenha extends ValidadorPerfil {
     @override
     String? verificar(DadosPerfil dados){
-        if(dados.senha.length < 8){
+        if(dados.senha.length < 6){
             return 'A senha deve ter pelo menos 8 caracteres';
         }
         if(!RegExp(r'[A-Za-z]').hasMatch(dados.senha)){
